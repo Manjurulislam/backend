@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
+use App\Enum\Message;
+use App\Http\Controllers\BaseController;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class ProductController extends Controller
+class ProductController extends BaseController
 {
     /**
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
@@ -30,16 +31,6 @@ class ProductController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param \Illuminate\Http\Request $request
@@ -51,38 +42,18 @@ class ProductController extends Controller
             $data = $request->all();
             if ($request->hasFile('image')) {
                 $path          = $this->uploadFile($request, 'image', 'product');
-                $data['image'] = Storage::url($path);
+                $data['image'] = $path;
             }
 
             $product = Product::create($data);
             if ($product) {
-                return response(['message' => 'Item has been created successfully', 'status' => 'success'], 201);
+                return $this->response(Message::SUCCESS, 'success', 201);
             }
         } catch (\Exception $e) {
-            return response(['message' => $e->getMessage(), 'status' => 'error'], 400);
+            Log::debug($e->getMessage());
+            return $this->response(Message::ERROR, 'error', 400);
+
         }
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-
     }
 
     /**
@@ -92,7 +63,7 @@ class ProductController extends Controller
      * @param int $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
         try {
 
@@ -100,37 +71,43 @@ class ProductController extends Controller
             if ($request->hasFile('image')) {
                 $this->deleteFile($product->image);
                 $path          = $this->uploadFile($request, 'image', 'product');
-                $data['image'] = Storage::url($path);
+                $data['image'] = $path;
             }
 
             $products = $product->fill($data)->save();
 
             if ($products) {
-                return response(['message' => 'Item has been updated successfully', 'status' => 'success'], 201);
+                return $this->response(Message::SUCCESS, 'success', 201);
             }
         } catch (\Exception $e) {
-            return response(['message' => $e->getMessage(), 'status' => 'error'], 400);
+            Log::debug($e->getMessage());
+            return $this->response(Message::ERROR, 'error', 400);
         }
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\Response
+     * @param Product $product
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function destroy(Product $product)
     {
         try {
             if ($product->delete()) {
                 $this->deleteFile($product->image);
-                return response(['message' => 'Item has been deleted successfully', 'status' => 'success'], 200);
+                return $this->response(Message::DELETE, 'success', 200);
             }
         } catch (\Exception $e) {
-            return response(['message' => $e->getMessage(), 'status' => 'error'], 400);
+            Log::debug($e->getMessage());
+            return $this->response(Message::ERROR, 'error', 400);
         }
     }
 
+    /**
+     * @param $request
+     * @param $file_name
+     * @param $upload_dir
+     * @return false|string
+     */
     public function uploadFile($request, $file_name, $upload_dir)
     {
         if ($request->hasFile($file_name)) {
@@ -139,7 +116,6 @@ class ProductController extends Controller
             $up_path  = "$upload_dir";
             $path     = Storage::disk('public')->putFileAs($up_path, $file, $filename);
 
-            //dd($path);
             if ($file->getError()) {
                 return $file->getErrorMessage();
             }
@@ -148,9 +124,12 @@ class ProductController extends Controller
         }
     }
 
+    /**
+     * @param $file
+     * @return bool
+     */
     public function deleteFile($file)
     {
-        $status = is_file(public_path($file)) ? unlink(public_path($file)) : false;
-        return $status;
+        return Storage::disk('public')->delete($file);
     }
 }

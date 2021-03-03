@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -19,6 +20,11 @@ class Product extends Model
         'image',
         'status',
     ];
+
+ /*   public function getImageAttribute($value)
+    {
+        return Storage::disk('public')->url($value);
+    }*/
 
     public function scopeActive($query)
     {

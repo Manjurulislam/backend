@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ProductResource extends JsonResource
 {
@@ -14,13 +15,14 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $image = Storage::disk('public')->url($this->image);
         //  return parent::toArray($request);
         return [
             'id'          => $this->id,
             'title'       => $this->title,
             'price'       => $this->price,
             'description' => $this->description,
-            'image'       => url($this->image),
+            'image'       => $image,
             'status'      => $this->status,
         ];
     }
