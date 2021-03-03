@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('auth:api', ['except' => ['login']]);
     }
 
@@ -53,7 +54,7 @@ class AuthController extends Controller
     {
         auth()->logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json(['message' => 'User successfully signed out', 'status' => 'success']);
     }
 
 

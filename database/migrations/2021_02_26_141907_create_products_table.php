@@ -20,6 +20,7 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 8, 2);
             $table->string('image');
             $table->tinyInteger('status')->default(1);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -26,7 +26,6 @@ Route::middleware('api')->group(function () {
 });
 
 
-
 Route::middleware('jwt.token')->group(function () {
     Route::resource('products', ProductController::class);
 });

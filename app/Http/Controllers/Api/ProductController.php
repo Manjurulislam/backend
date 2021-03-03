@@ -95,14 +95,16 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         try {
-            $update = $request->all();
+
+            $data = $request->only(['title', 'description', 'price', 'image', 'status']);
             if ($request->hasFile('image')) {
                 $this->deleteFile($product->image);
-                $path            = $this->uploadFile($request, 'image', 'product');
-                $update['image'] = Storage::url($path);
+                $path          = $this->uploadFile($request, 'image', 'product');
+                $data['image'] = Storage::url($path);
             }
 
-            $products = $product->update($update);
+            $products = $product->fill($data)->save();
+
             if ($products) {
                 return response(['message' => 'Item has been updated successfully', 'status' => 'success'], 201);
             }

@@ -26,7 +26,7 @@ class ProductRequest extends FormRequest
         return [
             'title'  => 'required',
             'price'  => 'required|integer',
-            'image'  => 'required|image|mimes:jpeg,png,jpg,svg',
+            'image'  => 'required|image|mimes:jpeg,png,jpg,svg|max:2000',
             'status' => 'required',
         ];
     }
