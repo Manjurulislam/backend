@@ -93,7 +93,7 @@ class ProductController extends BaseController
     {
         try {
             if ($product->delete()) {
-                $this->deleteFile($product->image);
+                //$this->deleteFile($product->image);
                 return $this->response(Message::DELETE, 'success', 200);
             }
         } catch (\Exception $e) {
