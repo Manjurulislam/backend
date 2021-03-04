@@ -1,5 +1,3 @@
-## Laravel Backend 
-
 ## Project setup
 ```
 composer install
