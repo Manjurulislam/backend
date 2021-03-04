@@ -8,8 +8,8 @@ php artisan db:seed
 
 php artisan serve
 ```
-## Authenticate
+## Jwt Auth
 ```
-user = admin@gmail.com
+username = admin@gmail.com
 
 password =  12345
